@@ -85,5 +85,4 @@ function dragOver(e,i) {
       enemy.style.backgroundColor = 'initial'
     }
   })
-  // dragEnd()
 }
