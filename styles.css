@@ -8,13 +8,13 @@
 
 .enemy {
   background-image: url('./assets/Penumbra.webp');
-  width: 375px;
-  height: 300px;
+  width: 33.3%;
+  height: 250px;
   background-repeat: no-repeat;
   background-size: cover;
 }
 
-.hand {
+.hand, .enemies {
   display: flex;
   flex-direction: row;
   flex-wrap:wrap;
