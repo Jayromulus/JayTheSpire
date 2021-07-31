@@ -19,13 +19,12 @@ let storage = {
 let storageProxy = new Proxy(storage, {
   set: function (target, key, value) {
     if(target[key] !== value){
-
       // will console.log the key and value when it is changed as listened by the proxy
       console.log(`${key} set to ${value}`);
       target[key] = value;
       for(let i = 0; i < enemies.length; i++){
         if(i != value){
-          console.log('TEST RUN')
+          // console.log('TEST RUN')
           enemies[i].addEventListener('dragover', e => dragOver(e, i), { once: true })
         }
       }
@@ -62,21 +61,29 @@ enemies.forEach((enemy, index) => {
 
 //! FUNCTION ALLEY
 function dragStart(e,i) {
-  console.log('started drag')
+  // console.log('started drag')
 
   storageProxy.card = i
 }
 
 function dragEnd(e) {
-  console.log(`ended drag ${storage.card}`)
+  // console.log(`ended drag ${storage.card}`)
 
   enemies.forEach(enemy => {
     enemy.addEventListener('dragover', dragOver, { once: true })
+    enemy.style.backgroundColor = 'initial'
   })
 }
 
 function dragOver(e,i) {
   // console.log(`testing ${storage.card} dragover`)
   storageProxy.enemy = i
+  enemies.forEach((enemy, index) => {
+    if(index == i){
+      enemy.style.backgroundColor = 'black'
+    } else {
+      enemy.style.backgroundColor = 'initial'
+    }
+  })
   // dragEnd()
 }
