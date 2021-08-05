@@ -95,6 +95,7 @@ function dragEnd(e) {
 }
 
 function dragOver(e, i) {
+  console.log(e)
   // console.log(`testing ${storage.card} dragover`)
   storageProxy.enemy = i
   const currentEnemies = document.querySelectorAll('.enemy')
