@@ -145,14 +145,17 @@ enemiesList.forEach((enemy, index) => {
   currentBar.style.height = '100%'
   currentBar.classList.add(`enemy${index}hp`)
   currentBar.style.width = '100%'
-    
+  
+  
   maxBar.appendChild(currentBar)
   single.appendChild(maxBar)
   enemies.appendChild(single)
-
+  
   storage[`enemyCurrent${index + 1}`] = enemy.hp;
   storage.enemy = enemy.name
   storage.enemyId = enemy.id
+
+  currentBar.innerText = `${storage[`enemyCurrent${index + 1}`]}/${enemy.hp}`
 })
 
 
@@ -178,7 +181,7 @@ function drop() {
   const enemy = enemiesList.find(enemy => enemy.name === storage.enemy)
   console.log(`Card ${storage.card} dropped on enemy ${storage.enemy}`)
   const enemyHealth = document.querySelector(`.enemy${storage.enemyId - 1}hp`)
-
+// console.log('EnemyHealth', enemyHealth)
   // console.log(enemy)
   if(storage[`enemyCurrent${enemy.id}`] > 0){
     storage[`enemyCurrent${enemy.id}`] -= storage.card === 'Strike' ? (6 <= storage[`enemyCurrent${enemy.id}`] ? 6 : storage[`enemyCurrent${enemy.id}`]) : storage.card === 'Bash' ? (8 <= storage[`enemyCurrent${enemy.id}`] ? 8 : storage[`enemyCurrent${enemy.id}`]) : 0
@@ -202,7 +205,7 @@ function drop() {
   }
 
   enemyHealth.style.width = `${Math.floor((storage[`enemyCurrent${enemy.id}`] / enemiesList.find(item => item.id === enemy.id).hp) * 100)}%`
-
+  enemyHealth.innerText = `${storage[`enemyCurrent${enemy.id}`]}/${enemy.hp}`
   // TODO remove card from hand after use
 
   // TODO remove energy from pool after using card equal to its cost
