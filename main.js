@@ -145,12 +145,12 @@ enemiesList.forEach((enemy, index) => {
   currentBar.style.height = '100%'
   currentBar.classList.add(`enemy${index}hp`)
   currentBar.style.width = '100%'
-  
-  
+
+
   maxBar.appendChild(currentBar)
   single.appendChild(maxBar)
   enemies.appendChild(single)
-  
+
   storage[`enemyCurrent${index + 1}`] = enemy.hp;
   storage.enemy = enemy.name
   storage.enemyId = enemy.id
@@ -161,8 +161,7 @@ enemiesList.forEach((enemy, index) => {
 
 //! FUNCTION ALLEY
 function dragStart(e, i) {
-  console.log('started drag')
-
+  // console.log('started drag')
   storage.card = currentHand[i].name
   storage.cardId = currentHand[i].id
 }
@@ -178,22 +177,25 @@ function dragEnter(e, i) {
 }
 
 function drop() {
+  // enemy is from the enemiesList object
   const enemy = enemiesList.find(enemy => enemy.name === storage.enemy)
-  console.log(`Card ${storage.card} dropped on enemy ${storage.enemy}`)
+  // console.log(`Card ${storage.card} dropped on enemy ${storage.enemy}`)
+  // enemyHealth is coming from the page and is the green bar for their current health
   const enemyHealth = document.querySelector(`.enemy${storage.enemyId - 1}hp`)
-// console.log('EnemyHealth', enemyHealth)
-  // console.log(enemy)
-  if(storage[`enemyCurrent${enemy.id}`] > 0){
+
+  // checks if the card being used does damage and if it does it will do either as much damage as the card does or the remaining hp of the enemy if they are low enough
+  if (storage[`enemyCurrent${enemy.id}`] > 0) {
     storage[`enemyCurrent${enemy.id}`] -= storage.card === 'Strike' ? (6 <= storage[`enemyCurrent${enemy.id}`] ? 6 : storage[`enemyCurrent${enemy.id}`]) : storage.card === 'Bash' ? (8 <= storage[`enemyCurrent${enemy.id}`] ? 8 : storage[`enemyCurrent${enemy.id}`]) : 0
-    console.log(`${enemy.name} Current HP: ${storage[`enemyCurrent${enemy.id}`]}`)
+    // console.log(`${enemy.name} Current HP: ${storage[`enemyCurrent${enemy.id}`]}`)
   }
   else {
     console.log('he\'s already dead...')
   }
 
   // for of loop since foreach doesnt work on an html collection
+  // loops over the enemies and if they are alive get reset to transparent bg if they are dead they stay red
   for (child of enemies.children) {
-                                        // replace spaces with ''
+    // replace spaces with ''
     if (child.classList.contains(storage.enemy.replace(/\s/g, '')) && storage[`enemyCurrent${enemy.id}`] > 0)
       // TODO add condition to ignore resetting the background if the enemy is dead. not super sure how to make it happen
       // ? bug where the item will stay black bg after highlighting it AFTER killed, but will not stay after being killed
@@ -204,6 +206,7 @@ function drop() {
 
   }
 
+  // change width of green health bar and text within the health
   enemyHealth.style.width = `${Math.floor((storage[`enemyCurrent${enemy.id}`] / enemiesList.find(item => item.id === enemy.id).hp) * 100)}%`
   enemyHealth.innerText = `${storage[`enemyCurrent${enemy.id}`]}/${enemy.hp}`
   // TODO remove card from hand after use
@@ -256,6 +259,24 @@ function displayHand() {
 
     current.addEventListener('dragstart', e => dragStart(e, index))
     // current.addEventListener('dragend', dragEnd)
+
+
+
+    current.addEventListener('touchstart', function () {
+      console.log('btn touched');
+    })
+    // current.addEventListener('touchend', function () {
+    //   console.log('btn leaved');
+    // })
+    current.addEventListener('touchmove', function () {
+      console.log('btn leaved');
+    })
+    // current.addEventListener('touchleave', function () {
+    //   console.log('btn moving end');
+    // })
+    // current.addEventListener('touchcancel', function () {
+    //   console.log('btn moving cancel');
+    // })
 
     hand.appendChild(current)
   })
