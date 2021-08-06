@@ -7,7 +7,7 @@
 }
 
 .enemy {
-  background-image: url('./assets/Penumbra.webp');
+  /* background-image: url('./assets/Penumbra.webp'); */
   width: 33.3%;
   height: 250px;
   background-repeat: no-repeat;
