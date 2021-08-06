@@ -265,18 +265,18 @@ function displayHand() {
     current.addEventListener('touchstart', function () {
       console.log('btn touched');
     })
-    // current.addEventListener('touchend', function () {
-    //   console.log('btn leaved');
-    // })
+    current.addEventListener('touchend', function () {
+      console.log('btn leaved');
+    })
     current.addEventListener('touchmove', function () {
       console.log('btn leaved');
     })
-    // current.addEventListener('touchleave', function () {
-    //   console.log('btn moving end');
-    // })
-    // current.addEventListener('touchcancel', function () {
-    //   console.log('btn moving cancel');
-    // })
+    current.addEventListener('touchleave', function () {
+      console.log('btn moving end');
+    })
+    current.addEventListener('touchcancel', function () {
+      console.log('btn moving cancel');
+    })
 
     hand.appendChild(current)
   })
