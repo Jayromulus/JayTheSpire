@@ -265,18 +265,37 @@ function displayHand() {
     current.addEventListener('touchstart', function () {
       console.log('btn touched');
     })
-    current.addEventListener('touchend', function () {
-      console.log('btn leaved');
-    })
-    current.addEventListener('touchmove', function () {
-      console.log('btn leaved');
-    })
-    current.addEventListener('touchleave', function () {
-      console.log('btn moving end');
-    })
-    current.addEventListener('touchcancel', function () {
-      console.log('btn moving cancel');
-    })
+    // current.addEventListener('touchend', function () {
+    //   console.log('btn leaved');
+    // })
+
+    // window.onload = function() {
+      // find the element that you want to drag.
+      // var box = document.getElementById('box');
+      
+      /* listen to the touchmove event,
+      every time it fires, grab the location
+      of touch and assign it to box */
+      
+      current.addEventListener('touchmove', function(e) {
+        // grab the location of touch
+        var touchLocation = e.targetTouches[0];
+        
+        // assign box new coordinates based on the touch.
+        current.style.left = touchLocation.pageX + 'px';
+        current.style.top = touchLocation.pageY + 'px';
+      })
+      
+    // }
+    // current.addEventListener('touchmove', function () {
+    //   console.log('btn leaved');
+    // })
+    // current.addEventListener('touchleave', function () {
+    //   console.log('btn moving end');
+    // })
+    // current.addEventListener('touchcancel', function () {
+    //   console.log('btn moving cancel');
+    // })
 
     hand.appendChild(current)
   })
