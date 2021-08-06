@@ -1,6 +1,7 @@
 .card {
   width: 20%;
-  height: 250px;
+  height: 237px;
+  /* height: 375px; */
   background-size:cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -9,7 +10,7 @@
 .enemy {
   /* background-image: url('./assets/Penumbra.webp'); */
   width: 33.3%;
-  height: 250px;
+  height: 350px;
   background-repeat: no-repeat;
   background-size: cover;
 }

@@ -39,22 +39,22 @@ const deck = [
   {
     name: 'Defend',
     id: 2,
-    image:'./assets/Defend_R.webp',
+    image: './assets/Defend_R.webp',
   },
   {
     name: 'Defend',
     id: 2,
-    image:'./assets/Defend_R.webp',
+    image: './assets/Defend_R.webp',
   },
   {
     name: 'Defend',
     id: 2,
-    image:'./assets/Defend_R.webp',
+    image: './assets/Defend_R.webp',
   },
   {
     name: 'Defend',
     id: 2,
-    image:'./assets/Defend_R.webp',
+    image: './assets/Defend_R.webp',
   },
   {
     name: 'Bash',
@@ -64,15 +64,39 @@ const deck = [
 ]
 
 const enemiesList = [
-  './assets/Penumbra.webp',
-  './assets/Penumbra.webp',
-  './assets/Penumbra.webp'
+  {
+    name: 'Gremlin Nob',
+    id: 1,
+    hp: 83,
+    image: './assets/Gremlin-nob-pretty.webp'
+  },
+  {
+    name: 'Lagavulin',
+    id: 2,
+    hp: 119,
+    image: './assets/Lagavulin-zzz-pretty.webp'
+  },
+  {
+    name: 'Sentry',
+    id: 3,
+    hp: 43,
+    image: './assets/Sentry-pretty.webp'
+  }
+  // './assets/Penumbra.webp',
+  // './assets/Penumbra.webp',
+  // './assets/Penumbra.webp'
 ]
 
 // storage will be used as the "brains" to keep track of the card selected and the enemy targeted by the user.
 let storage = {
   card: '',
-  enemy: -1
+  cardId: -1,
+  enemy: '',
+  enemyId: -1,
+  enemyCurrent1: 0,
+  enemyCurrent2: 0,
+  enemyCurrent3: 0,
+  enemyCurrent4: 0,
 }
 
 // the proxy is being used as a sort of "event listener" for when the variable changes. in this case it will run a function tha happens when the obeject changes and will act accordingly
@@ -84,77 +108,100 @@ let storage = {
 //     if (target[key] !== value && value !== undefined) {
 //       // will console.log the key and value when it is changed as listened by the proxy
 //       console.log(`${key} set to ${value}`);
-//       target[key] = value;
-//       let currentEnemies = document.querySelectorAll('.enemy')
-//       // console.log(currentEnemies)
-//       for (let i = 0; i < currentEnemies.length; i++) {
-//         if (i != value) {
-//           // console.log('TEST RUN')
-//           currentEnemies[i].addEventListener('dragover', e => dragOver(e, i), { once: true })
-//         }
-//       }
 //       return true;
 //     }
 //   }
 // });
-
 // storageProxy.enemy = "test"; // console: 'hello_world set to test'
-
+// LOOK INTO JS PROXY OBJECT
 const currentHand = []
 const used = []
-drawHand()
+drawHand(5)
 
-draw.addEventListener('click', e => drawHand(e))
+draw.addEventListener('click', e => drawHand(5))
 
 // create array of card names to reference a json that will have all of the card listed with names, damage, block, description, effects
 //! MAIN DECK LOOP 
 //? possibly rephrase this to load deck order but only display hand at a time?
-// displayHand()
 
 enemiesList.forEach((enemy, index) => {
   const single = document.createElement('div')
-  single.style.backgroundImage = `url(${enemy})`
-  single.classList.add('enemy')
-  // single.addEventListener('dragover', e => dragOver(e, index), { once: true })
+  single.style.backgroundImage = `url(${enemy.image})`
+  single.classList.add('enemy', enemy.name.replace(/\s/g, ''))
   single.addEventListener('dragenter', e => {
     dragEnter(e, index)
   })
   single.addEventListener('dragover', e => e.preventDefault())
   single.addEventListener('drop', e => drop(e))
   enemies.appendChild(single)
-  storage.enemy = index;
+
+  storage[`enemyCurrent${index + 1}`] = enemy.hp;
+  storage.enemy = enemy.name
+  storage.enemyId = enemy.id
 })
 
 
 //! FUNCTION ALLEY
 function dragStart(e, i) {
-  // e.preventDefault()
   console.log('started drag')
 
   storage.card = currentHand[i].name
+  storage.cardId = currentHand[i].id
 }
 
 function dragEnter(e, i) {
   e.preventDefault()
-  storage.enemy = i
-  console.log(storage)
+  storage.enemy = enemiesList[i].name
+  storage.enemyId = enemiesList[i].id
+  // console.log(storage)
+  for (let index = 0; index < enemies.children.length; index++) {
+    enemies.children[index].style.backgroundColor = storage[`enemyCurrent${index + 1}`] <= 0 ? 'red' : index === i ? 'black' : 'transparent'
+  }
 }
 
 function drop() {
+  const enemy = enemiesList.find(enemy => enemy.name === storage.enemy)
   console.log(`Card ${storage.card} dropped on enemy ${storage.enemy}`)
+
+  // console.log(enemy)
+  if(storage[`enemyCurrent${enemy.id}`] > 0){
+    storage[`enemyCurrent${enemy.id}`] -= storage.card === 'Strike' ? 6 : storage.card === 'Bash' ? 8 : 0
+    console.log(`${enemy.name} Current HP: ${storage[`enemyCurrent${enemy.id}`]}`)
+  }
+  else {
+    console.log('he\'s already dead...')
+  }
+
+  // for of loop since foreach doesnt work on an html collection
+  for (child of enemies.children) {
+    if (child.classList.contains(storage.enemy.replace(/\s/g, '')) && storage[`enemyCurrent${enemy.id}`] > 0)
+      // TODO add condition to ignore resetting the background if the enemy is dead. not super sure how to make it happen
+      // ? bug where the item will stay black bg after highlighting it AFTER killed, but will not stay after being killed
+      // nevermind im just stupid and was doing this above damage calculation instead of after lmfao what a dummy
+      child.style.backgroundColor = 'transparent'
+    else if (child.classList.contains(storage.enemy.replace(/\s/g, '')) && storage[`enemyCurrent${enemy.id}`] <= 0)
+      child.style.backgroundColor = 'red'
+
+  }
+
+  // TODO remove card from hand after use
+
+  // TODO remove energy from pool after using card equal to its cost
+
+  // TODO reset hand after hp becomes 0 or when button is pressed to "end turn"
 }
 
-function drawHand() {
+function drawHand(handSize) {
   // e.preventDefault()
   // console.log('drawing hand:', e)
-  while (currentHand[0] !== undefined){
+  while (currentHand[0] !== undefined) {
     currentHand.shift()
   }
-  for (let i = 0; i < 5; i++) {
+  for (let i = 0; i < handSize; i++) {
     if (deck.length > used.length) {
       cardInHand()
     } else {
-      while(used[0] !== undefined){
+      while (used[0] !== undefined) {
         used.shift()
       }
       cardInHand()
@@ -165,7 +212,7 @@ function drawHand() {
 
 function cardInHand() {
   const rnd = Math.floor(Math.random() * deck.length)
-  if (used.includes(rnd)){
+  if (used.includes(rnd)) {
     cardInHand()
   } else {
     used.push(rnd)
@@ -178,42 +225,42 @@ function displayHand() {
   console.log(used)
   currentHand.forEach((card, index) => {
     const current = document.createElement('div')
-  
+
     current.classList.add('card', `c${index}`)
-  
+
     current.draggable = 'true'
-  
+
     current.style.backgroundImage = `url(${card.image})`
-  
+
     current.addEventListener('dragstart', e => dragStart(e, index))
     // current.addEventListener('dragend', dragEnd)
-  
+
     hand.appendChild(current)
   })
 }
 
 
-// function dragEnd(e) {
-//   // console.log(`ended drag ${storage.card}`)
-//   const currentEnemies = document.querySelectorAll('.enemy')
-//   currentEnemies.forEach(enemy => {
-//     enemy.addEventListener('dragover', dragOver, { once: true })
-//     enemy.style.backgroundColor = 'initial'
-//   })
-//   storageProxy.card = -1
-//   storageProxy.enemy = -1
-// }
 
-// function dragOver(e, i) {
-//   console.log(e)
-//   // console.log(`testing ${storage.card} dragover`)
-//   storageProxy.enemy = i
-//   const currentEnemies = document.querySelectorAll('.enemy')
-//   currentEnemies.forEach((enemy, index) => {
-//     if (index == i) {
-//       enemy.style.backgroundColor = 'black'
-//     } else {
-//       enemy.style.backgroundColor = 'initial'
-//     }
-//   })
-// }
+// https://stackoverflow.com/questions/52554613/html-5-drag-and-drop-not-working-on-mobile-screen
+
+// drag does not work on mobile so touch is required to use it on mobile devices
+
+// // get The element on which to attach the event 
+// var btn = document.querySelector('.btn');
+
+// // attaching each event listener
+// btn.addEventListener('touchstart', function(){
+// 	console.log('btn touched');
+// })
+// btn.addEventListener('touchend', function(){
+// 	console.log('btn leaved');
+// })
+// btn.addEventListener('touchmove', function(){
+// 	console.log('btn leaved');
+// })
+// btn.addEventListener('touchleave', function(){
+// 	console.log('btn moving end');
+// })
+// btn.addEventListener('touchcancel', function(){
+// 	console.log('btn moving cancel');
+// })
