@@ -128,11 +128,26 @@ enemiesList.forEach((enemy, index) => {
   const single = document.createElement('div')
   single.style.backgroundImage = `url(${enemy.image})`
   single.classList.add('enemy', enemy.name.replace(/\s/g, ''))
+
   single.addEventListener('dragenter', e => {
     dragEnter(e, index)
   })
   single.addEventListener('dragover', e => e.preventDefault())
   single.addEventListener('drop', e => drop(e))
+
+  const maxBar = document.createElement('div')
+  const currentBar = document.createElement('div')
+
+  maxBar.style.margin = '100% 5% 0px'
+  maxBar.style.height = '5%'
+  maxBar.style.backgroundColor = '#777777'
+  currentBar.style.backgroundColor = '#25c724'
+  currentBar.style.height = '100%'
+  currentBar.classList.add(`enemy${index}hp`)
+  currentBar.style.width = '100%'
+    
+  maxBar.appendChild(currentBar)
+  single.appendChild(maxBar)
   enemies.appendChild(single)
 
   storage[`enemyCurrent${index + 1}`] = enemy.hp;
@@ -162,6 +177,7 @@ function dragEnter(e, i) {
 function drop() {
   const enemy = enemiesList.find(enemy => enemy.name === storage.enemy)
   console.log(`Card ${storage.card} dropped on enemy ${storage.enemy}`)
+  const enemyHealth = document.querySelector(`.enemy${storage.enemyId - 1}hp`)
 
   // console.log(enemy)
   if(storage[`enemyCurrent${enemy.id}`] > 0){
@@ -174,6 +190,7 @@ function drop() {
 
   // for of loop since foreach doesnt work on an html collection
   for (child of enemies.children) {
+                                        // replace spaces with ''
     if (child.classList.contains(storage.enemy.replace(/\s/g, '')) && storage[`enemyCurrent${enemy.id}`] > 0)
       // TODO add condition to ignore resetting the background if the enemy is dead. not super sure how to make it happen
       // ? bug where the item will stay black bg after highlighting it AFTER killed, but will not stay after being killed
@@ -183,6 +200,8 @@ function drop() {
       child.style.backgroundColor = 'red'
 
   }
+
+  enemyHealth.style.width = `${Math.floor((storage[`enemyCurrent${enemy.id}`] / enemiesList.find(item => item.id === enemy.id).hp) * 100)}%`
 
   // TODO remove card from hand after use
 
