@@ -181,7 +181,7 @@ function drop() {
 
   // console.log(enemy)
   if(storage[`enemyCurrent${enemy.id}`] > 0){
-    storage[`enemyCurrent${enemy.id}`] -= storage.card === 'Strike' ? 6 : storage.card === 'Bash' ? 8 : 0
+    storage[`enemyCurrent${enemy.id}`] -= storage.card === 'Strike' ? (6 <= storage[`enemyCurrent${enemy.id}`] ? 6 : storage[`enemyCurrent${enemy.id}`]) : storage.card === 'Bash' ? (8 <= storage[`enemyCurrent${enemy.id}`] ? 8 : storage[`enemyCurrent${enemy.id}`]) : 0
     console.log(`${enemy.name} Current HP: ${storage[`enemyCurrent${enemy.id}`]}`)
   }
   else {
