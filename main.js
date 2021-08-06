@@ -1,15 +1,66 @@
 const enemies = document.querySelector('.enemies')
 const hand = document.querySelector('.hand')
+const draw = document.querySelector('button')
 
 //! CURRENT DECK IMAGE DEFINITION
 // this will get replaced with an array of object names that will be used to reference a json using [] during the hand display loop. 
 const deck = [
-  './assets/Magma_Morsel.webp',
-  './assets/Antumbra_Morsel.webp',
-  './assets/Morsel_Excavator.webp',
-  './assets/Morsel_Jeweler.webp',
-  './assets/Morsel_Miner.webp',
-  './assets/Rubble_Morsel.webp'
+  // './assets/Magma_Morsel.webp',
+  // './assets/Antumbra_Morsel.webp',
+  // './assets/Morsel_Excavator.webp',
+  // './assets/Morsel_Jeweler.webp',
+  // './assets/Morsel_Miner.webp',
+  // './assets/Rubble_Morsel.webp'
+  {
+    name: 'Strike',
+    id: 1,
+    image: './assets/Strike_R.webp',
+  },
+  {
+    name: 'Strike',
+    id: 1,
+    image: './assets/Strike_R.webp',
+  },
+  {
+    name: 'Strike',
+    id: 1,
+    image: './assets/Strike_R.webp',
+  },
+  {
+    name: 'Strike',
+    id: 1,
+    image: './assets/Strike_R.webp',
+  },
+  {
+    name: 'Strike',
+    id: 1,
+    image: './assets/Strike_R.webp',
+  },
+  {
+    name: 'Defend',
+    id: 2,
+    image:'./assets/Defend_R.webp',
+  },
+  {
+    name: 'Defend',
+    id: 2,
+    image:'./assets/Defend_R.webp',
+  },
+  {
+    name: 'Defend',
+    id: 2,
+    image:'./assets/Defend_R.webp',
+  },
+  {
+    name: 'Defend',
+    id: 2,
+    image:'./assets/Defend_R.webp',
+  },
+  {
+    name: 'Bash',
+    id: 3,
+    image: './assets/Bash.webp',
+  }
 ]
 
 const enemiesList = [
@@ -20,7 +71,7 @@ const enemiesList = [
 
 // storage will be used as the "brains" to keep track of the card selected and the enemy targeted by the user.
 let storage = {
-  card: -1,
+  card: '',
   enemy: -1
 }
 
@@ -49,23 +100,16 @@ let storage = {
 
 // storageProxy.enemy = "test"; // console: 'hello_world set to test'
 
+const currentHand = []
+const used = []
+drawHand()
+
+draw.addEventListener('click', e => drawHand(e))
+
 // create array of card names to reference a json that will have all of the card listed with names, damage, block, description, effects
 //! MAIN DECK LOOP 
 //? possibly rephrase this to load deck order but only display hand at a time?
-deck.forEach((image, index) => {
-  const current = document.createElement('div')
-
-  current.classList.add('card', `c${index}`)
-
-  current.draggable = 'true'
-
-  current.style.backgroundImage = `url(${image})`
-
-  current.addEventListener('dragstart', e => dragStart(e, index))
-  // current.addEventListener('dragend', dragEnd)
-
-  hand.appendChild(current)
-})
+// displayHand()
 
 enemiesList.forEach((enemy, index) => {
   const single = document.createElement('div')
@@ -87,7 +131,7 @@ function dragStart(e, i) {
   // e.preventDefault()
   console.log('started drag')
 
-  storage.card = i
+  storage.card = currentHand[i].name
 }
 
 function dragEnter(e, i) {
@@ -98,6 +142,54 @@ function dragEnter(e, i) {
 
 function drop() {
   console.log(`Card ${storage.card} dropped on enemy ${storage.enemy}`)
+}
+
+function drawHand() {
+  // e.preventDefault()
+  // console.log('drawing hand:', e)
+  while (currentHand[0] !== undefined){
+    currentHand.shift()
+  }
+  for (let i = 0; i < 5; i++) {
+    if (deck.length > used.length) {
+      cardInHand()
+    } else {
+      while(used[0] !== undefined){
+        used.shift()
+      }
+      cardInHand()
+    }
+  }
+  displayHand()
+}
+
+function cardInHand() {
+  const rnd = Math.floor(Math.random() * deck.length)
+  if (used.includes(rnd)){
+    cardInHand()
+  } else {
+    used.push(rnd)
+    currentHand.push(deck[rnd]);
+  }
+}
+
+function displayHand() {
+  hand.innerHTML = ''
+  console.log(used)
+  currentHand.forEach((card, index) => {
+    const current = document.createElement('div')
+  
+    current.classList.add('card', `c${index}`)
+  
+    current.draggable = 'true'
+  
+    current.style.backgroundImage = `url(${card.image})`
+  
+    current.addEventListener('dragstart', e => dragStart(e, index))
+    // current.addEventListener('dragend', dragEnd)
+  
+    hand.appendChild(current)
+  })
 }
 
 
