@@ -1,6 +1,8 @@
 const enemies = document.querySelector('.enemies')
 const hand = document.querySelector('.hand')
-const draw = document.querySelector('button')
+// const draw = document.querySelector('button')
+const energyDisplay = document.querySelector('.energy')
+const endTurn = document.querySelector('.endTurn')
 
 //! CURRENT DECK IMAGE DEFINITION
 // this will get replaced with an array of object names that will be used to reference a json using [] during the hand display loop. 
@@ -15,51 +17,61 @@ const deck = [
     name: 'Strike',
     id: 1,
     image: './assets/Strike_R.webp',
+    energy: 1
   },
   {
     name: 'Strike',
     id: 1,
     image: './assets/Strike_R.webp',
+    energy: 1
   },
   {
     name: 'Strike',
     id: 1,
     image: './assets/Strike_R.webp',
+    energy: 1
   },
   {
     name: 'Strike',
     id: 1,
     image: './assets/Strike_R.webp',
+    energy: 1
   },
   {
     name: 'Strike',
     id: 1,
     image: './assets/Strike_R.webp',
+    energy: 1
   },
   {
     name: 'Defend',
     id: 2,
     image: './assets/Defend_R.webp',
+    energy: 1
   },
   {
     name: 'Defend',
     id: 2,
     image: './assets/Defend_R.webp',
+    energy: 1
   },
   {
     name: 'Defend',
     id: 2,
     image: './assets/Defend_R.webp',
+    energy: 1
   },
   {
     name: 'Defend',
     id: 2,
     image: './assets/Defend_R.webp',
+    energy: 1
   },
   {
     name: 'Bash',
     id: 3,
     image: './assets/Bash.webp',
+    energy: 2
   }
 ]
 
@@ -89,6 +101,7 @@ const enemiesList = [
 
 // storage will be used as the "brains" to keep track of the card selected and the enemy targeted by the user.
 let storage = {
+  energy: 3,
   card: '',
   cardId: -1,
   enemy: '',
@@ -116,9 +129,11 @@ let storage = {
 // LOOK INTO JS PROXY OBJECT
 const currentHand = []
 const used = []
+energyDisplay.innerText = 'Energy: ' + storage.energy
 drawHand(5)
+endTurn.addEventListener('click', turnEnd)
 
-draw.addEventListener('click', e => drawHand(5))
+// draw.addEventListener('click', e => drawHand(5))
 
 // create array of card names to reference a json that will have all of the card listed with names, damage, block, description, effects
 //! MAIN DECK LOOP 
@@ -182,38 +197,45 @@ function drop() {
   // console.log(`Card ${storage.card} dropped on enemy ${storage.enemy}`)
   // enemyHealth is coming from the page and is the green bar for their current health
   const enemyHealth = document.querySelector(`.enemy${storage.enemyId - 1}hp`)
+  
+  const myCard = deck.find(card => card.name === storage.card)
+  if (myCard.energy <= storage.energy) {
+    storage.energy -= myCard.energy
+    energyDisplay.innerText = `Energy: ${storage.energy}`
+    // checks if the card being used does damage and if it does it will do either as much damage as the card does or the remaining hp of the enemy if they are low enough
+    if (storage[`enemyCurrent${enemy.id}`] > 0) {
+      storage[`enemyCurrent${enemy.id}`] -= storage.card === 'Strike' ? (6 <= storage[`enemyCurrent${enemy.id}`] ? 6 : storage[`enemyCurrent${enemy.id}`]) : storage.card === 'Bash' ? (8 <= storage[`enemyCurrent${enemy.id}`] ? 8 : storage[`enemyCurrent${enemy.id}`]) : 0
+      // console.log(`${enemy.name} Current HP: ${storage[`enemyCurrent${enemy.id}`]}`)
+    }
+    else {
+      console.log('he\'s already dead...')
+    }
 
-  // checks if the card being used does damage and if it does it will do either as much damage as the card does or the remaining hp of the enemy if they are low enough
-  if (storage[`enemyCurrent${enemy.id}`] > 0) {
-    storage[`enemyCurrent${enemy.id}`] -= storage.card === 'Strike' ? (6 <= storage[`enemyCurrent${enemy.id}`] ? 6 : storage[`enemyCurrent${enemy.id}`]) : storage.card === 'Bash' ? (8 <= storage[`enemyCurrent${enemy.id}`] ? 8 : storage[`enemyCurrent${enemy.id}`]) : 0
-    // console.log(`${enemy.name} Current HP: ${storage[`enemyCurrent${enemy.id}`]}`)
+    // for of loop since foreach doesnt work on an html collection
+    // loops over the enemies and if they are alive get reset to transparent bg if they are dead they stay red
+    for (child of enemies.children) {
+      // replace spaces with ''
+      if (child.classList.contains(storage.enemy.replace(/\s/g, '')) && storage[`enemyCurrent${enemy.id}`] > 0)
+        // TODO add condition to ignore resetting the background if the enemy is dead. not super sure how to make it happen
+        // ? bug where the item will stay black bg after highlighting it AFTER killed, but will not stay after being killed
+        // nevermind im just stupid and was doing this above damage calculation instead of after lmfao what a dummy
+        child.style.backgroundColor = 'transparent'
+      else if (child.classList.contains(storage.enemy.replace(/\s/g, '')) && storage[`enemyCurrent${enemy.id}`] <= 0)
+        child.style.backgroundColor = 'red'
+
+    }
+
+    // change width of green health bar and text within the health
+    enemyHealth.style.width = `${Math.floor((storage[`enemyCurrent${enemy.id}`] / enemiesList.find(item => item.id === enemy.id).hp) * 100)}%`
+    enemyHealth.innerText = `${storage[`enemyCurrent${enemy.id}`]}/${enemy.hp}`
+    // TODO remove card from hand after use
+
+    // TODO remove energy from pool after using card equal to its cost
+
+    // TODO reset hand after hp becomes 0 or when button is pressed to "end turn"
+  } else {
+    console.log('not enough energy')
   }
-  else {
-    console.log('he\'s already dead...')
-  }
-
-  // for of loop since foreach doesnt work on an html collection
-  // loops over the enemies and if they are alive get reset to transparent bg if they are dead they stay red
-  for (child of enemies.children) {
-    // replace spaces with ''
-    if (child.classList.contains(storage.enemy.replace(/\s/g, '')) && storage[`enemyCurrent${enemy.id}`] > 0)
-      // TODO add condition to ignore resetting the background if the enemy is dead. not super sure how to make it happen
-      // ? bug where the item will stay black bg after highlighting it AFTER killed, but will not stay after being killed
-      // nevermind im just stupid and was doing this above damage calculation instead of after lmfao what a dummy
-      child.style.backgroundColor = 'transparent'
-    else if (child.classList.contains(storage.enemy.replace(/\s/g, '')) && storage[`enemyCurrent${enemy.id}`] <= 0)
-      child.style.backgroundColor = 'red'
-
-  }
-
-  // change width of green health bar and text within the health
-  enemyHealth.style.width = `${Math.floor((storage[`enemyCurrent${enemy.id}`] / enemiesList.find(item => item.id === enemy.id).hp) * 100)}%`
-  enemyHealth.innerText = `${storage[`enemyCurrent${enemy.id}`]}/${enemy.hp}`
-  // TODO remove card from hand after use
-
-  // TODO remove energy from pool after using card equal to its cost
-
-  // TODO reset hand after hp becomes 0 or when button is pressed to "end turn"
 }
 
 function drawHand(handSize) {
@@ -258,50 +280,37 @@ function displayHand() {
     current.style.backgroundImage = `url(${card.image})`
 
     current.addEventListener('dragstart', e => dragStart(e, index))
-    // current.addEventListener('dragend', dragEnd)
-
-
-
-    current.addEventListener('touchstart', function () {
-      console.log('btn touched');
-    })
-    // current.addEventListener('touchend', function () {
-    //   console.log('btn leaved');
-    // })
-
-    // window.onload = function() {
-      // find the element that you want to drag.
-      // var box = document.getElementById('box');
-      
-      /* listen to the touchmove event,
-      every time it fires, grab the location
-      of touch and assign it to box */
-      
-      current.addEventListener('touchmove', function(e) {
-        // grab the location of touch
-        var touchLocation = e.targetTouches[0];
-        
-        // assign box new coordinates based on the touch.
-        current.style.left = touchLocation.pageX + 'px';
-        current.style.top = touchLocation.pageY + 'px';
-      })
-      
-    // }
-    // current.addEventListener('touchmove', function () {
-    //   console.log('btn leaved');
-    // })
-    // current.addEventListener('touchleave', function () {
-    //   console.log('btn moving end');
-    // })
-    // current.addEventListener('touchcancel', function () {
-    //   console.log('btn moving cancel');
-    // })
 
     hand.appendChild(current)
   })
 }
 
 
+function turnEnd(e){
+  e.preventDefault()
+  drawHand(5)
+  storage.energy = 3
+  energyDisplay.innerText = `Energy: ${storage.energy}`
+
+}
+
+
+
+// current.addEventListener('dragend', dragEnd)
+
+    // current.addEventListener('touchstart', function () {
+    //   console.log('btn touched');
+    // })
+
+    // current.addEventListener('touchmove', function (e) {
+    //   // grab the location of touch
+    //   var touchLocation = e.targetTouches[0];
+    //   console.log(current.name, 'is being moved')
+
+    //   // assign box new coordinates based on the touch.
+    //   current.style.left = touchLocation.pageX + 'px';
+    //   current.style.top = touchLocation.pageY + 'px';
+    // })
 
 // https://stackoverflow.com/questions/52554613/html-5-drag-and-drop-not-working-on-mobile-screen
 
